@@ -1,7 +1,7 @@
 name: av
 description: A new Flutter plugin project.
 version: 0.0.1
-homepage:
+# homepage:
 
 environment:
   sdk: '>=3.0.2 <4.0.0'
@@ -10,7 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  path_provider: ^2.0.15
   plugin_platform_interface: ^2.0.2
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:
