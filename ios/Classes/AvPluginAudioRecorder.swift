@@ -4,24 +4,27 @@ import AVFoundation
 public class AvPluginAudioRecorder: NSObject {
   private static var audioRecorder: AVAudioRecorder?
 
-  public static func prepareMpeg4Aac(sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
-    return prepareLossy(errorCode: "prepareMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), fileExtension: ".m4a", sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitRate: bitRate)
+  public static func prepareToRecordMpeg4Aac(sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
+    return prepareToRecordLossy(errorCode: "prepareToRecordMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), fileExtension: ".m4a", sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitRate: bitRate)
   }
 
-  public static func prepareAlac(sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
-    return prepareLossless(errorCode: "prepareAlac", formatIdKey: Int(kAudioFormatAppleLossless), fileExtension: ".alac", sampleRate: sampleRate, numberOfChannels: numberOfChannels)
+  public static func prepareToRecordAlac(sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
+    return prepareToRecordLossless(errorCode: "prepareToRecordAlac", formatIdKey: Int(kAudioFormatAppleLossless), fileExtension: ".alac", sampleRate: sampleRate, numberOfChannels: numberOfChannels)
   }
 
-  public static func start() -> Bool {
+  public static func startRecording() -> Bool {
     return audioRecorder?.record() != nil
   }
   
-  public static func stop() -> Bool {
+  public static func stopRecording() {
     audioRecorder?.stop()
-    return true
   }
 
-  private static func prepareLossy(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
+  public static func deleteRecording() -> Bool {
+    return audioRecorder?.deleteRecording() != nil
+  }
+
+  private static func prepareToRecordLossy(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
     let settings = [
       AVFormatIDKey: formatIdKey,
       AVSampleRateKey: sampleRate,
@@ -29,21 +32,21 @@ public class AvPluginAudioRecorder: NSObject {
       AVEncoderBitRateKey: bitRate,
     ]
 
-    return prepare(errorCode: errorCode, formatIdKey: formatIdKey, fileExtension: fileExtension, settings: settings)
+    return prepareToRecord(errorCode: errorCode, formatIdKey: formatIdKey, fileExtension: fileExtension, settings: settings)
   }
 
-  private static func prepareLossless(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
+  private static func prepareToRecordLossless(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
     let settings = [
       AVFormatIDKey: formatIdKey,
       AVSampleRateKey: sampleRate ?? 44100,
       AVNumberOfChannelsKey: numberOfChannels ?? 2,
     ]
 
-    return prepare(errorCode: errorCode, formatIdKey: formatIdKey, fileExtension: fileExtension, settings: settings)
+    return prepareToRecord(errorCode: errorCode, formatIdKey: formatIdKey, fileExtension: fileExtension, settings: settings)
   }
 
 
-  private static func prepare(errorCode: String, formatIdKey: Int, fileExtension: String, settings: [String : Int]) -> (String?, FlutterError?) {
+  private static func prepareToRecord(errorCode: String, formatIdKey: Int, fileExtension: String, settings: [String : Int]) -> (String?, FlutterError?) {
     let session = AVAudioSession.sharedInstance()
 
     do {

@@ -1,1 +1,1 @@
-export 'widgets/cupertino_audio_recorder.dart' show CupertinoAudioRecorder;
+export 'widgets/audio_recorder.dart' show AudioRecorder;

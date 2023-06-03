@@ -42,8 +42,24 @@ abstract class AvPlatformInterface extends PlatformInterface {
     throw UnimplementedError('startRecording() has not been implemented.');
   }
 
-  Future<bool?> stopRecording() {
+  Future<String?> stopRecording() {
     throw UnimplementedError('stopRecording() has not been implemented.');
+  }
+
+  Future<bool?> deleteRecording() {
+    throw UnimplementedError('deleteRecording() has not been implemented.');
+  }
+
+  Future<bool?> prepareToPlay(String url) {
+    throw UnimplementedError('prepareToPlay() has not been implemented.');
+  }
+
+  Future<bool?> startPlaying() {
+    throw UnimplementedError('startPlaying() has not been implemented.');
+  }
+
+  Future<void> stopPlaying() {
+    throw UnimplementedError('stopPlaying() has not been implemented.');
   }
 
   // Future<String?> getPlatformVersion() {

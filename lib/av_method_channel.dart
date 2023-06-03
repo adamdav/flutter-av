@@ -31,7 +31,6 @@ class MethodChannelAv extends AvPlatformInterface {
       {int numberOfChannels = 2, int sampleRate = 44100}) async {
     final result =
         await methodChannel.invokeMethod<String?>('prepareToRecordAlac', {
-      'filename': '.alac',
       'numberOfChannels': numberOfChannels,
       'sampleRate': sampleRate,
     });
@@ -50,8 +49,29 @@ class MethodChannelAv extends AvPlatformInterface {
   }
 
   @override
-  Future<bool?> stopRecording() async {
-    return await methodChannel.invokeMethod<bool?>('stopRecording');
+  Future<String?> stopRecording() async {
+    return await methodChannel.invokeMethod<String?>('stopRecording');
+  }
+
+  @override
+  Future<bool?> deleteRecording() async {
+    return await methodChannel.invokeMethod<bool?>('deleteRecording');
+  }
+
+  @override
+  Future<bool?> prepareToPlay(String url) async {
+    return await methodChannel
+        .invokeMethod<bool?>('prepareToPlay', {'url': url});
+  }
+
+  @override
+  Future<bool?> startPlaying() async {
+    return await methodChannel.invokeMethod<bool?>('startPlaying');
+  }
+
+  @override
+  Future<void> stopPlaying() async {
+    return await methodChannel.invokeMethod<void>('stopPlaying');
   }
 
   // @override

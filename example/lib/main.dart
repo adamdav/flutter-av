@@ -1,3 +1,4 @@
+import 'package:av/widgets/audio_recorder.dart';
 import 'package:flutter/material.dart';
 // import 'dart:async';
 
@@ -54,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(child: CupertinoAudioRecorder()),
+        body: const Center(child: AudioRecorder()),
       ),
     );
   }
