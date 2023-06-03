@@ -55,8 +55,8 @@ class MethodChannelAv extends AvPlatformInterface {
   }
 
   @override
-  Future<void> stopRecording() async {
-    await methodChannel.invokeMethod<void>('stopRecording');
+  Future<bool?> stopRecording() async {
+    await methodChannel.invokeMethod<bool?>('stopRecording');
   }
 
   // @override

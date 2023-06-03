@@ -42,7 +42,7 @@ abstract class AvPlatformInterface extends PlatformInterface {
     throw UnimplementedError('startRecording() has not been implemented.');
   }
 
-  Future<void> stopRecording() {
+  Future<bool?> stopRecording() {
     throw UnimplementedError('stopRecording() has not been implemented.');
   }
 
