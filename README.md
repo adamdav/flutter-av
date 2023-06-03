@@ -1,6 +1,6 @@
 # av
 
-The best audio/video recording package for Flutter.
+An audio/video recording package for Flutter.
 
 ## Getting Started
 
