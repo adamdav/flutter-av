@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 
 import 'av_platform_interface.dart';
 
@@ -16,10 +14,7 @@ class MethodChannelAv extends AvPlatformInterface {
       {int numberOfChannels = 2,
       int sampleRate = 44100,
       int bitRate = 256000}) async {
-    // final tempDir = await getTemporaryDirectory();
     final args = {
-      // 'filename': 'file://${tempDir.absolute.path}/${const Uuid().v4()}.m4a',
-
       'numberOfChannels': numberOfChannels,
       'sampleRate': sampleRate,
       'bitRate': bitRate,
@@ -56,7 +51,7 @@ class MethodChannelAv extends AvPlatformInterface {
 
   @override
   Future<bool?> stopRecording() async {
-    await methodChannel.invokeMethod<bool?>('stopRecording');
+    return await methodChannel.invokeMethod<bool?>('stopRecording');
   }
 
   // @override

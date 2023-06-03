@@ -5,7 +5,7 @@ public class AvPluginAudioRecorder: NSObject {
   private static var audioRecorder: AVAudioRecorder?
 
   public static func prepareMpeg4Aac(sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
-    return prepareLossy(errorCode: "prepareMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), fileExtension: ".m4a", sampleRate: sampleRate, numberOfChannels: numberOfChannels)
+    return prepareLossy(errorCode: "prepareMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), fileExtension: ".m4a", sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitRate: bitRate)
   }
 
   public static func prepareAlac(sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
@@ -21,7 +21,7 @@ public class AvPluginAudioRecorder: NSObject {
     return true
   }
 
-  private static func prepareLossy(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
+  private static func prepareLossy(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
     let settings = [
       AVFormatIDKey: formatIdKey,
       AVSampleRateKey: sampleRate,
