@@ -28,6 +28,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   void initState() {
     super.initState();
     _prepareToRecord();
+    _listenForAudioPlayerEvents();
   }
 
   Future<void> _prepareToRecord() async {
@@ -73,6 +74,26 @@ class _AudioRecorderState extends State<AudioRecorder> {
     });
   }
 
+  void _listenForAudioPlayerEvents() {
+    AudioPlayerUtils.getEventStream().listen((event) {
+      if (event['type'] == 'audioPlayer/didFinishPlaying') {
+        setState(() {
+          _isPlaying = false;
+        });
+      }
+      // print('event: $event');
+      // if (event == 'onReady') {
+      //   setState(() {
+      //     _isPreparedToPlay = true;
+      //   });
+      // } else if (event == 'onCompleted') {
+      //   setState(() {
+      //     _isPlaying = false;
+      //   });
+      // }
+    });
+  }
+
   Future<void> _prepareToPlay() async {
     if (_recordingDestinationUrl != null) {
       await AudioPlayerUtils.prepareToPlay(_recordingDestinationUrl!);
@@ -89,8 +110,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
     });
   }
 
-  Future<void> _stopPlaying() async {
-    await AudioPlayerUtils.stopPlaying();
+  Future<void> _pausePlaying() async {
+    await AudioPlayerUtils.pausePlaying();
     setState(() {
       _isPlaying = false;
     });
@@ -117,13 +138,16 @@ class _AudioRecorderState extends State<AudioRecorder> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (_recordingDestinationUrl != null)
-                DeleteButton(onPressed: _deleteRecording),
+                DeleteButton(onPressed: () async {
+                  await _deleteRecording();
+                  await _prepareToRecord();
+                }),
               if (_recordingDestinationUrl != null)
                 PlayButton(
                     onPressed: _isPreparedToPlay
                         ? () async {
                             if (_isPlaying) {
-                              await _stopPlaying();
+                              await _pausePlaying();
                             } else {
                               await _startPlaying();
                             }

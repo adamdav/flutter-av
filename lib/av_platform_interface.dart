@@ -58,8 +58,12 @@ abstract class AvPlatformInterface extends PlatformInterface {
     throw UnimplementedError('startPlaying() has not been implemented.');
   }
 
-  Future<void> stopPlaying() {
-    throw UnimplementedError('stopPlaying() has not been implemented.');
+  Future<void> pausePlaying() {
+    throw UnimplementedError('pausePlaying() has not been implemented.');
+  }
+
+  Stream<dynamic> getEventStream() {
+    throw UnimplementedError('getEventStream() has not been implemented.');
   }
 
   // Future<String?> getPlatformVersion() {

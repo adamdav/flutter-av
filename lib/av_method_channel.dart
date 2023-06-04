@@ -7,7 +7,10 @@ import 'av_platform_interface.dart';
 class MethodChannelAv extends AvPlatformInterface {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
-  final methodChannel = const MethodChannel('av');
+  final methodChannel = const MethodChannel('av/methods');
+  final eventChannel = const EventChannel('av/events');
+  // final audioRecorderEventChannel =
+  //     const EventChannel('av/events/audio_recorder');
 
   @override
   Future<String?> prepareToRecordMpeg4Aac(
@@ -19,10 +22,8 @@ class MethodChannelAv extends AvPlatformInterface {
       'sampleRate': sampleRate,
       'bitRate': bitRate,
     };
-    print(args);
     final result = await methodChannel.invokeMethod<String?>(
         'prepareToRecordMpeg4Aac', args);
-    print("prepared to record MPEG4 AAC: $result");
     return result;
   }
 
@@ -44,7 +45,6 @@ class MethodChannelAv extends AvPlatformInterface {
     int bitRate = 256000,
   }) async {
     final result = await methodChannel.invokeMethod<bool?>('startRecording');
-    print("started recording: $result");
     return result;
   }
 
@@ -70,8 +70,13 @@ class MethodChannelAv extends AvPlatformInterface {
   }
 
   @override
-  Future<void> stopPlaying() async {
-    return await methodChannel.invokeMethod<void>('stopPlaying');
+  Future<void> pausePlaying() async {
+    return await methodChannel.invokeMethod<void>('pausePlaying');
+  }
+
+  @override
+  Stream<dynamic> getEventStream() {
+    return eventChannel.receiveBroadcastStream();
   }
 
   // @override

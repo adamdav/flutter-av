@@ -9,7 +9,11 @@ class AudioPlayerUtils {
     return await AvPlatformInterface.instance.startPlaying();
   }
 
-  static Future<void> stopPlaying() async {
-    return await AvPlatformInterface.instance.stopPlaying();
+  static Future<void> pausePlaying() async {
+    return await AvPlatformInterface.instance.pausePlaying();
+  }
+
+  static Stream<dynamic> getEventStream() {
+    return AvPlatformInterface.instance.getEventStream();
   }
 }

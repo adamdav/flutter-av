@@ -4,11 +4,11 @@ import AVFoundation
 public class AvPluginAudioRecorder: NSObject {
   private static var audioRecorder: AVAudioRecorder?
 
-  public static func prepareToRecordMpeg4Aac(sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
+  public static func prepareToRecordMpeg4Aac(sampleRate: Int, numberOfChannels: Int, bitRate: Int, onEvent: (Any) -> ()) -> (String?, FlutterError?) {
     return prepareToRecordLossy(errorCode: "prepareToRecordMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), fileExtension: ".m4a", sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitRate: bitRate)
   }
 
-  public static func prepareToRecordAlac(sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
+  public static func prepareToRecordAlac(sampleRate: Int, numberOfChannels: Int, onEvent: (Any) -> ()) -> (String?, FlutterError?) {
     return prepareToRecordLossless(errorCode: "prepareToRecordAlac", formatIdKey: Int(kAudioFormatAppleLossless), fileExtension: ".alac", sampleRate: sampleRate, numberOfChannels: numberOfChannels)
   }
 
