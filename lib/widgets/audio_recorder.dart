@@ -1,6 +1,6 @@
 import 'package:av/utils/audio_player_utils.dart';
 import 'package:av/utils/audio_recorder_utils.dart';
-import 'package:av/widgets/audio_recording_timer.dart';
+import 'package:av/widgets/clock.dart';
 import 'package:av/widgets/delete_button.dart';
 import 'package:av/widgets/play_button.dart';
 import 'package:av/widgets/record_button.dart';
@@ -130,7 +130,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       // mainAxisSize: MainAxisSize.max,
       children: [
-        Expanded(child: AudioRecordingTimer(isRecording: _isRecording)),
+        Expanded(child: Clock(isRunning: _isRecording || _isPlaying)),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -172,8 +172,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                                   await _stopRecording();
                                   await _prepareToPlay();
                                 } else {
-                                  if (_isPreparedToRecord)
-                                    await _startRecording();
+                                  await _startRecording();
                                 }
                               }
                             : null,

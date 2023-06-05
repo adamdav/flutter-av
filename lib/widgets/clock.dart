@@ -1,20 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class AudioRecordingTimer extends StatefulWidget {
-  const AudioRecordingTimer({
+class Clock extends StatefulWidget {
+  const Clock({
     super.key,
-    required this.isRecording,
+    required this.isRunning,
   });
 
-  final bool isRecording;
+  final bool isRunning;
 
   @override
-  State<AudioRecordingTimer> createState() => _AudioRecordingTimerState();
+  State<Clock> createState() => _ClockState();
 }
 
-class _AudioRecordingTimerState extends State<AudioRecordingTimer> {
+class _ClockState extends State<Clock> {
   Timer? _timer;
   int _start = 0;
 
@@ -49,11 +50,11 @@ class _AudioRecordingTimerState extends State<AudioRecordingTimer> {
   }
 
   @override
-  void didUpdateWidget(covariant AudioRecordingTimer oldWidget) {
+  void didUpdateWidget(covariant Clock oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.isRecording && widget.isRecording) {
+    if (!oldWidget.isRunning && widget.isRunning) {
       _startTimer();
-    } else if (oldWidget.isRecording && !widget.isRecording) {
+    } else if (oldWidget.isRunning && !widget.isRunning) {
       _stopTimer();
       _resetTimer();
     }
@@ -76,6 +77,14 @@ class _AudioRecordingTimerState extends State<AudioRecordingTimer> {
   @override
   Widget build(BuildContext context) {
     return Text(_timerText,
-        style: TextStyle(fontSize: 48, fontFamily: 'monospace'));
+        style: GoogleFonts.robotoMono(
+          fontSize: 48,
+          fontWeight: FontWeight.w700,
+          fontStyle: FontStyle.italic,
+        ));
+    // style: TextStyle(
+    //     fontSize: 48,
+    //     fontFamily: 'Roboto Mono',
+    //     fontWeight: FontWeight.w700));
   }
 }
