@@ -12,8 +12,9 @@ class SaveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50,
-      child: ElevatedButton(
+      child: OutlinedButton(
           style: ButtonStyle(
+            // elevation: MaterialStateProperty.all<double>(0),
             backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(

@@ -13,8 +13,9 @@ class DeleteButton extends StatelessWidget {
     return SizedBox(
       height: 50,
       // width: 50,
-      child: ElevatedButton(
+      child: OutlinedButton(
           style: ButtonStyle(
+            // elevation: MaterialStateProperty.all<double>(0),
             backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(

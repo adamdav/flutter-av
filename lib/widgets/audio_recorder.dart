@@ -130,28 +130,32 @@ class _AudioRecorderState extends State<AudioRecorder> {
       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       // mainAxisSize: MainAxisSize.max,
       children: [
-        Expanded(child: Clock(isRunning: _isRecording || _isPlaying)),
         Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // if (_isRecording) AudioSpectrum(),
-              // if (!_isRecording) AudioWaveform(),
-            ],
-          ),
-        ),
+            child: Center(child: Clock(isRunning: _isRecording || _isPlaying))),
+        // Expanded(
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       // if (_isRecording) AudioSpectrum(),
+        //       // if (!_isRecording) AudioWaveform(),
+        //     ],
+        //   ),
+        // ),
         Expanded(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (_recordingDestinationUrl != null)
+                  if (_recordingDestinationUrl != null) ...[
                     SkipBackButton(
                         icon: widget.skipBackIcon,
                         onPressed: () async {
                           await AudioPlayerUtils.skip(-15);
                         }),
+                    SizedBox(width: 10)
+                  ],
                   if (_recordingDestinationUrl != null)
                     PlayButton(
                         onPressed: _isPreparedToPlay
@@ -177,29 +181,33 @@ class _AudioRecorderState extends State<AudioRecorder> {
                               }
                             : null,
                         isRecording: _isRecording),
-                  if (_recordingDestinationUrl != null)
+                  if (_recordingDestinationUrl != null) ...[
+                    SizedBox(width: 10),
                     SkipForwardButton(
                         icon: widget.skipForwardIcon,
                         onPressed: () async {
                           await AudioPlayerUtils.skip(15);
                           // _saveRecording();
                           // await _prepareToRecord();
-                        }),
+                        })
+                  ],
                 ],
               ),
+              SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (_recordingDestinationUrl != null)
+                  if (_recordingDestinationUrl != null) ...[
                     DeleteButton(onPressed: () async {
                       await _deleteRecording();
                       await _prepareToRecord();
                     }),
-                  if (_recordingDestinationUrl != null)
+                    SizedBox(width: 10),
                     SaveButton(onPressed: () async {
                       _saveRecording();
                       await _prepareToRecord();
-                    }),
+                    })
+                  ],
                 ],
               ),
             ],
