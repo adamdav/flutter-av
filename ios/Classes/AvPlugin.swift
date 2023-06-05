@@ -58,9 +58,24 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
         }
         error == nil ? result(true) : result(error)
       case "startPlaying":
-        result(AvPluginAudioPlayer.startPlaying(audioPlayer))
+        if (audioPlayer == nil) {
+          result(FlutterError(code: "startPlaying", message: "prepareToPlay has not been called", details: nil))
+          return
+        }
+        result(AvPluginAudioPlayer.startPlaying(audioPlayer!))
       case "pausePlaying":
-        result(AvPluginAudioPlayer.pausePlaying(audioPlayer))
+        if (audioPlayer == nil) {
+          result(FlutterError(code: "pausePlaying", message: "prepareToPlay has not been called", details: nil))
+          return
+        }
+        result(AvPluginAudioPlayer.pausePlaying(audioPlayer!))
+      case "skip":
+        if (audioPlayer == nil) {
+          result(FlutterError(code: "skip", message: "prepareToPlay has not been called", details: nil))
+          return
+        }
+        let arguments = call.arguments as! [String: Double]
+        result(AvPluginAudioPlayer.skip(audioPlayer!, interval: arguments["interval"]!))
 
     // case "getPlatformVersion":
     //   result("macOS " + ProcessInfo.processInfo.operatingSystemVersionString)

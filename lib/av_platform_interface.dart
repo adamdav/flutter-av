@@ -62,6 +62,10 @@ abstract class AvPlatformInterface extends PlatformInterface {
     throw UnimplementedError('pausePlaying() has not been implemented.');
   }
 
+  Future<bool?> skip(num interval) async {
+    throw UnimplementedError('getEventStream() has not been implemented.');
+  }
+
   Stream<dynamic> getEventStream() {
     throw UnimplementedError('getEventStream() has not been implemented.');
   }

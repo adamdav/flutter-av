@@ -13,6 +13,10 @@ class AudioPlayerUtils {
     return await AvPlatformInterface.instance.pausePlaying();
   }
 
+  static Future<bool?> skip(num interval) async {
+    return await AvPlatformInterface.instance.skip(interval);
+  }
+
   static Stream<dynamic> getEventStream() {
     return AvPlatformInterface.instance.getEventStream();
   }

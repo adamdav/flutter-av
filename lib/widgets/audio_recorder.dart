@@ -150,8 +150,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                     SkipBackButton(
                         icon: widget.skipBackIcon,
                         onPressed: () async {
-                          // await _deleteRecording();
-                          // await _prepareToRecord();
+                          await AudioPlayerUtils.skip(-15);
                         }),
                   if (_recordingDestinationUrl != null)
                     PlayButton(
@@ -183,6 +182,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                     SkipForwardButton(
                         icon: widget.skipForwardIcon,
                         onPressed: () async {
+                          await AudioPlayerUtils.skip(15);
                           // _saveRecording();
                           // await _prepareToRecord();
                         }),

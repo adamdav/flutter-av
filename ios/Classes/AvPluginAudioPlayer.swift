@@ -20,16 +20,22 @@ public class AvPluginAudioPlayer: NSObject {
       return (nil, FlutterError(code: "prepareToPlay", message: "Failed to activate audio session instance", details: "\(error)"))
     }
 
-    let audioPlayer = try? AVAudioPlayer(contentsOf: URL(string: url)!)
-    let didPrepare = audioPlayer?.prepareToPlay() != nil
+    let audioPlayer: AVAudioPlayer? = try? AVAudioPlayer(contentsOf: URL(string: url)!)
+    let didPrepare: Bool = audioPlayer?.prepareToPlay() != nil
     return (didPrepare ? audioPlayer : nil, nil)
   }
 
-  public static func startPlaying(_ audioPlayer: AVAudioPlayer?) -> Bool {
-    return audioPlayer?.play() != nil
+  public static func startPlaying(_ audioPlayer: AVAudioPlayer) -> Bool {
+    return audioPlayer.play()
   }
 
-  public static func pausePlaying(_ audioPlayer: AVAudioPlayer?) -> Bool {
-    return audioPlayer?.pause() != nil
+  public static func pausePlaying(_ audioPlayer: AVAudioPlayer) -> Bool {
+    audioPlayer.pause()
+    return true
+  }
+
+  public static func skip(_ audioPlayer: AVAudioPlayer, interval: Double) -> Bool {
+    audioPlayer.currentTime += interval
+    return true
   }
 }

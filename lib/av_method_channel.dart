@@ -75,6 +75,12 @@ class MethodChannelAv extends AvPlatformInterface {
   }
 
   @override
+  Future<bool?> skip(num interval) async {
+    return await methodChannel
+        .invokeMethod<bool?>('skip', {'interval': interval});
+  }
+
+  @override
   Stream<dynamic> getEventStream() {
     return eventChannel.receiveBroadcastStream();
   }
