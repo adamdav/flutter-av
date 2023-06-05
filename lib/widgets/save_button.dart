@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:flutter/material.dart';
 
 class SaveButton extends StatelessWidget {
@@ -10,8 +11,7 @@ class SaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 75,
-      width: 75,
+      height: 50,
       child: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
@@ -24,10 +24,14 @@ class SaveButton extends StatelessWidget {
           onPressed: onPressed,
           // color: isRecording ? Colors.red : Colors.grey[300],
           child: Center(
-              child: Icon(
-            CupertinoIcons.floppy_disk,
-            size: 25,
-            color: Colors.grey[700],
+              child: Row(
+            children: [
+              SvgPicture.asset('icons/download.svg', package: 'av'),
+              Text(
+                "Save",
+                style: TextStyle(color: Colors.grey[700], fontSize: 10),
+              )
+            ],
           ))),
     );
   }

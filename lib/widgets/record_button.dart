@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:flutter/material.dart';
 
 class RecordButton extends StatelessWidget {
@@ -12,8 +13,8 @@ class RecordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100,
-      width: 100,
+      height: 75,
+      width: 75,
       child: ElevatedButton(
           // height: 100,
           // minWidth: 100,
@@ -30,25 +31,11 @@ class RecordButton extends StatelessWidget {
           onPressed: onPressed,
           // color: isRecording ? Colors.red : Colors.grey[300],
           child: Center(
-            child: isRecording
-                ? Container(
-                    width: 25,
-                    height: 25,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                  )
-                : Container(
-                    width: 25,
-                    height: 25,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-          )),
+              child: isRecording
+                  ? SvgPicture.asset('icons/player-stop-filled.svg',
+                      package: 'av')
+                  : SvgPicture.asset('icons/player-record-filled.svg',
+                      package: 'av'))),
     );
   }
 }

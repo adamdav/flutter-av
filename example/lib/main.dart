@@ -52,10 +52,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: const Center(child: AudioRecorder()),
+        // appBar: AppBar(
+        //   title: const Text('Plugin example app'),
+        // ),
+        body: SafeArea(child: const Center(child: AudioRecorder())),
       ),
     );
   }

@@ -14,11 +14,13 @@ class AvPlugin: FlutterPlugin, MethodCallHandler {
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
+  private lateinit var methodChannel : MethodChannel
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "av")
-    channel.setMethodCallHandler(this)
+    methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "av/methods")
+    methodChannel.setMethodCallHandler(this)
+    eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "av/events")
+    eventChannel.setStreamHandler(this)
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {

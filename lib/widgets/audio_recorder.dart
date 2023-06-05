@@ -5,12 +5,19 @@ import 'package:av/widgets/delete_button.dart';
 import 'package:av/widgets/play_button.dart';
 import 'package:av/widgets/record_button.dart';
 import 'package:av/widgets/save_button.dart';
+import 'package:av/widgets/skip_back_button.dart';
+import 'package:av/widgets/skip_forward_button.dart';
 import 'package:flutter/cupertino.dart';
 
 class AudioRecorder extends StatefulWidget {
   const AudioRecorder({
     super.key,
+    this.skipBackIcon,
+    this.skipForwardIcon,
   });
+
+  final Widget? skipBackIcon;
+  final Widget? skipForwardIcon;
 
   @override
   State<AudioRecorder> createState() => _AudioRecorderState();
@@ -134,44 +141,68 @@ class _AudioRecorderState extends State<AudioRecorder> {
           ),
         ),
         Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
             children: [
-              if (_recordingDestinationUrl != null)
-                DeleteButton(onPressed: () async {
-                  await _deleteRecording();
-                  await _prepareToRecord();
-                }),
-              if (_recordingDestinationUrl != null)
-                PlayButton(
-                    onPressed: _isPreparedToPlay
-                        ? () async {
-                            if (_isPlaying) {
-                              await _pausePlaying();
-                            } else {
-                              await _startPlaying();
-                            }
-                          }
-                        : null,
-                    isPlaying: _isPlaying),
-              if (_recordingDestinationUrl == null)
-                RecordButton(
-                    onPressed: _isPreparedToRecord
-                        ? () async {
-                            if (_isRecording) {
-                              await _stopRecording();
-                              await _prepareToPlay();
-                            } else {
-                              if (_isPreparedToRecord) await _startRecording();
-                            }
-                          }
-                        : null,
-                    isRecording: _isRecording),
-              if (_recordingDestinationUrl != null)
-                SaveButton(onPressed: () async {
-                  _saveRecording();
-                  await _prepareToRecord();
-                }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_recordingDestinationUrl != null)
+                    SkipBackButton(
+                        icon: widget.skipBackIcon,
+                        onPressed: () async {
+                          // await _deleteRecording();
+                          // await _prepareToRecord();
+                        }),
+                  if (_recordingDestinationUrl != null)
+                    PlayButton(
+                        onPressed: _isPreparedToPlay
+                            ? () async {
+                                if (_isPlaying) {
+                                  await _pausePlaying();
+                                } else {
+                                  await _startPlaying();
+                                }
+                              }
+                            : null,
+                        isPlaying: _isPlaying),
+                  if (_recordingDestinationUrl == null)
+                    RecordButton(
+                        onPressed: _isPreparedToRecord
+                            ? () async {
+                                if (_isRecording) {
+                                  await _stopRecording();
+                                  await _prepareToPlay();
+                                } else {
+                                  if (_isPreparedToRecord)
+                                    await _startRecording();
+                                }
+                              }
+                            : null,
+                        isRecording: _isRecording),
+                  if (_recordingDestinationUrl != null)
+                    SkipForwardButton(
+                        icon: widget.skipForwardIcon,
+                        onPressed: () async {
+                          // _saveRecording();
+                          // await _prepareToRecord();
+                        }),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_recordingDestinationUrl != null)
+                    DeleteButton(onPressed: () async {
+                      await _deleteRecording();
+                      await _prepareToRecord();
+                    }),
+                  if (_recordingDestinationUrl != null)
+                    SaveButton(onPressed: () async {
+                      _saveRecording();
+                      await _prepareToRecord();
+                    }),
+                ],
+              ),
             ],
           ),
         ),

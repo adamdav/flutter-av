@@ -60,7 +60,7 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
       case "startPlaying":
         result(AvPluginAudioPlayer.startPlaying(audioPlayer))
       case "pausePlaying":
-        AvPluginAudioPlayer.pausePlaying(audioPlayer)
+        result(AvPluginAudioPlayer.pausePlaying(audioPlayer))
 
     // case "getPlatformVersion":
     //   result("macOS " + ProcessInfo.processInfo.operatingSystemVersionString)

@@ -29,7 +29,7 @@ public class AvPluginAudioPlayer: NSObject {
     return audioPlayer?.play() != nil
   }
 
-  public static func pausePlaying(_ audioPlayer: AVAudioPlayer?) {
-    audioPlayer?.pause() != nil
+  public static func pausePlaying(_ audioPlayer: AVAudioPlayer?) -> Bool {
+    return audioPlayer?.pause() != nil
   }
 }

@@ -3,18 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:flutter/material.dart';
 
-class PlayButton extends StatelessWidget {
-  const PlayButton(
-      {super.key, required this.onPressed, required this.isPlaying});
+class SkipBackButton extends StatelessWidget {
+  const SkipBackButton({super.key, required this.onPressed, this.icon});
 
-  final Function()? onPressed;
-  final bool isPlaying;
+  final Function() onPressed;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 75,
-      width: 75,
+      height: 50,
+      width: 50,
       child: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
@@ -25,12 +24,16 @@ class PlayButton extends StatelessWidget {
             ),
           ),
           onPressed: onPressed,
+          // color: isRecording ? Colors.red : Colors.grey[300],
           child: Center(
-              child: isPlaying
-                  ? SvgPicture.asset('icons/player-pause-filled.svg',
-                      package: 'av')
-                  : SvgPicture.asset('icons/player-play-filled.svg',
+              child: icon ??
+                  SvgPicture.asset('icons/rewind-backward-15.svg',
                       package: 'av'))),
+      //     Icon(
+      //   CupertinoIcons.backward_fill,
+      //   size: 20,
+      //   color: Colors.grey[700],
+      // )
     );
   }
 }
