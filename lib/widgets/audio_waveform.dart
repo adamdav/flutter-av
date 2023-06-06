@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class AudioWaveform extends StatelessWidget {
   const AudioWaveform(
@@ -13,12 +14,13 @@ class AudioWaveform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width =
-        amplitudes.length * barWidth + (amplitudes.length - 1) * barSpace;
+    // final width = amplitudes.isNotEmpty
+    //     ? amplitudes.length * barWidth + (amplitudes.length - 1) * barSpace
+    //     : 0.0;
     return CustomPaint(
-      size: Size(width, 500),
-      painter: _AudioWaveformPainter(amplitudes: amplitudes),
-    );
+        size: const Size(double.infinity, 500),
+        painter: _AudioWaveformPainter(
+            amplitudes: amplitudes, barWidth: barWidth, barSpace: barSpace));
   }
 }
 

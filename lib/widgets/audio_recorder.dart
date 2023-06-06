@@ -32,6 +32,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   String? _recordingDestinationUrl;
   bool _isPreparedToPlay = false;
   bool _isPlaying = false;
+  // final _waveformScrollController = ScrollController();
 
   @override
   void initState() {
@@ -128,6 +129,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       // mainAxisSize: MainAxisSize.max,
       children: [
@@ -139,7 +141,9 @@ class _AudioRecorderState extends State<AudioRecorder> {
               // width: double.infinity,
               // height: 200,
               // color: Colors.red,
-              child: AudioWaveform(amplitudes: _amplitudes),
+              child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: AudioWaveform(amplitudes: _amplitudes)),
             )),
         Expanded(
           child: Column(
