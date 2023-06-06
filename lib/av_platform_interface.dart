@@ -23,7 +23,7 @@ abstract class AvPlatformInterface extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> prepareToRecordMpeg4Aac(
+  Future<bool?> prepareToRecordMpeg4Aac(
       {int numberOfChannels = 2,
       int sampleRate = 44100,
       int bitRate = 256000}) {
@@ -31,7 +31,7 @@ abstract class AvPlatformInterface extends PlatformInterface {
         'prepareToRecordMpeg4Aac() has not been implemented.');
   }
 
-  Future<String?> prepareToRecordAlac({
+  Future<bool?> prepareToRecordAlac({
     int numberOfChannels = 2,
     int sampleRate = 44100,
   }) {

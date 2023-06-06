@@ -1,5 +1,5 @@
-import 'package:av/utils/audio_player_utils.dart';
-import 'package:av/utils/audio_recorder_utils.dart';
+import 'package:av/av_platform_interface.dart';
+import 'package:av/widgets/audio_waveform.dart';
 import 'package:av/widgets/clock.dart';
 import 'package:av/widgets/delete_button.dart';
 import 'package:av/widgets/play_button.dart';
@@ -8,6 +8,7 @@ import 'package:av/widgets/save_button.dart';
 import 'package:av/widgets/skip_back_button.dart';
 import 'package:av/widgets/skip_forward_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class AudioRecorder extends StatefulWidget {
   const AudioRecorder({
@@ -24,6 +25,7 @@ class AudioRecorder extends StatefulWidget {
 }
 
 class _AudioRecorderState extends State<AudioRecorder> {
+  List<num> _amplitudes = [];
   List<String> _savedRecordings = [];
   bool _isPreparedToRecord = false;
   bool _isRecording = false;
@@ -35,26 +37,27 @@ class _AudioRecorderState extends State<AudioRecorder> {
   void initState() {
     super.initState();
     _prepareToRecord();
-    _listenForAudioPlayerEvents();
+    _listenForEvents();
   }
 
   Future<void> _prepareToRecord() async {
     final isPreparedToRecord =
-        (await AudioRecorderUtils.prepareToRecordMpeg4Aac()) != null;
+        (await AvPlatformInterface.instance.prepareToRecordMpeg4Aac()) != null;
     setState(() {
       _isPreparedToRecord = isPreparedToRecord;
     });
   }
 
   Future<void> _startRecording() async {
-    await AudioRecorderUtils.startRecording();
+    await AvPlatformInterface.instance.startRecording();
     setState(() {
       _isRecording = true;
     });
   }
 
   Future<void> _stopRecording() async {
-    final recordingDestinationUrl = await AudioRecorderUtils.stopRecording();
+    final recordingDestinationUrl =
+        await AvPlatformInterface.instance.stopRecording();
     setState(() {
       _isRecording = false;
       _recordingDestinationUrl = recordingDestinationUrl;
@@ -62,9 +65,10 @@ class _AudioRecorderState extends State<AudioRecorder> {
   }
 
   Future<void> _deleteRecording() async {
-    await AudioRecorderUtils.deleteRecording();
+    await AvPlatformInterface.instance.deleteRecording();
     setState(() {
       // _savedRecordings = [..._savedRecordings, _recordingDestinationUrl!];
+      _amplitudes = [];
       _recordingDestinationUrl = null;
       // _isRecording = false;
       // _recordingDestinationUrl = recordingDestinationUrl;
@@ -81,29 +85,26 @@ class _AudioRecorderState extends State<AudioRecorder> {
     });
   }
 
-  void _listenForAudioPlayerEvents() {
-    AudioPlayerUtils.getEventStream().listen((event) {
-      if (event['type'] == 'audioPlayer/didFinishPlaying') {
+  void _listenForEvents() {
+    AvPlatformInterface.instance.getEventStream().listen((event) {
+      if (event['type'] == 'audioPlayer/finishedPlaying') {
         setState(() {
           _isPlaying = false;
         });
       }
-      // print('event: $event');
-      // if (event == 'onReady') {
-      //   setState(() {
-      //     _isPreparedToPlay = true;
-      //   });
-      // } else if (event == 'onCompleted') {
-      //   setState(() {
-      //     _isPlaying = false;
-      //   });
-      // }
+      if (event['type'] == 'audioRecorder/metered') {
+        print(event['payload']);
+        setState(() {
+          _amplitudes = [..._amplitudes, event['payload']['avgAmplitude']];
+        });
+      }
     });
   }
 
   Future<void> _prepareToPlay() async {
     if (_recordingDestinationUrl != null) {
-      await AudioPlayerUtils.prepareToPlay(_recordingDestinationUrl!);
+      await AvPlatformInterface.instance
+          .prepareToPlay(_recordingDestinationUrl!);
       setState(() {
         _isPreparedToPlay = true;
       });
@@ -111,14 +112,14 @@ class _AudioRecorderState extends State<AudioRecorder> {
   }
 
   Future<void> _startPlaying() async {
-    await AudioPlayerUtils.startPlaying();
+    await AvPlatformInterface.instance.startPlaying();
     setState(() {
       _isPlaying = true;
     });
   }
 
   Future<void> _pausePlaying() async {
-    await AudioPlayerUtils.pausePlaying();
+    await AvPlatformInterface.instance.pausePlaying();
     setState(() {
       _isPlaying = false;
     });
@@ -132,15 +133,14 @@ class _AudioRecorderState extends State<AudioRecorder> {
       children: [
         Expanded(
             child: Center(child: Clock(isRunning: _isRecording || _isPlaying))),
-        // Expanded(
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [
-        //       // if (_isRecording) AudioSpectrum(),
-        //       // if (!_isRecording) AudioWaveform(),
-        //     ],
-        //   ),
-        // ),
+        Expanded(
+            flex: 2,
+            child: Container(
+              // width: double.infinity,
+              // height: 200,
+              // color: Colors.red,
+              child: AudioWaveform(amplitudes: _amplitudes),
+            )),
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +152,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                     SkipBackButton(
                         icon: widget.skipBackIcon,
                         onPressed: () async {
-                          await AudioPlayerUtils.skip(-15);
+                          await AvPlatformInterface.instance.skip(-15);
                         }),
                     SizedBox(width: 10)
                   ],
@@ -186,7 +186,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                     SkipForwardButton(
                         icon: widget.skipForwardIcon,
                         onPressed: () async {
-                          await AudioPlayerUtils.skip(15);
+                          await AvPlatformInterface.instance.skip(15);
                           // _saveRecording();
                           // await _prepareToRecord();
                         })

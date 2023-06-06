@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import AVFAudio
+import Accelerate
 
 public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPlayerDelegate {
   // private static var audioPlayerEventStreamHandler = AudioPlayerEventStreamHandler()
@@ -49,7 +50,7 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
         let audioEngineInputNodeOutputFormat = audioEngine!.inputNode.outputFormat(forBus: 0)
         audioEngine!.connect(audioEngine!.inputNode, to: audioMixerNode!, format: audioEngineInputNodeOutputFormat)
 
-        let audioMixerNodeOutputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: audioEngineInputNodeOutputFormat.sampleRate, channels: 2, interleaved: false)
+        let audioMixerNodeOutputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: audioEngineInputNodeOutputFormat.sampleRate, channels: 1, interleaved: false)
         
         // let audioMixerNodeOutputFormat: AVAudioFormat = audioMixerNode!.outputFormat(forBus: 0)
         audioEngine!.connect(audioMixerNode!, to: audioEngine!.mainMixerNode, format: audioMixerNodeOutputFormat)
@@ -63,19 +64,7 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
         // Prepare the engine in advance, in order for the system to allocate the necessary resources.
         audioEngine!.prepare()
 
-        let audioRecordingUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(UUID().uuidString + ".caf")
-
-        // AVAudioFile uses the Core Audio Format (CAF) to write to disk.
-        // So we're using the caf file extension.
-        do {
-          audioRecordingFile = try AVAudioFile(forWriting: audioRecordingUrl, settings: audioMixerNode!.outputFormat(forBus: 0).settings)
-          result(audioRecordingFile!.url.absoluteString)
-        } catch {
-          result(FlutterError(code: "prepareToRecord", message: "Failed to create audio recording file", details: "\(error)"))
-          return
-        }
-
-
+        result(true)
 
         // result("")
         // audioRecordingFile = try AVAudioFile(forWriting: audioRecordingUrl, settings: audioMixerNodeOutputFormat.settings)
@@ -107,23 +96,52 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
       //   error == nil ? result(audioRecordingUrl) : result(error)
       case "startRecording":
         do {
-          // let tapNode: AVAudioNode = mixerNode
-          // let audioMixerNodeOutputFormat = audioMixerNode.outputFormat(forBus: 0)
+          let audioRecordingUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(UUID().uuidString + ".caf")
 
-          // // let audioFileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].documentURL.appendingPathComponent(UUID().uuidString + ".caf")
-          
-          // // AVAudioFile uses the Core Audio Format (CAF) to write to disk.
-          // // So we're using the caf file extension.
-          if audioRecordingFile == nil {
-            result(FlutterError(code: "startRecording", message: "prepareToRecord has not been called", details: nil))
+          // AVAudioFile uses the Core Audio Format (CAF) to write to disk.
+          // So we're using the caf file extension.
+          do {
+            audioRecordingFile = try AVAudioFile(forWriting: audioRecordingUrl, settings: audioMixerNode!.outputFormat(forBus: 0).settings)
+            // result(audioRecordingFile!.url.absoluteString)
+          } catch {
+            result(FlutterError(code: "startRecording", message: "Failed to create audio recording file", details: "\(error)"))
             return
           }
 
           // let audioFile: AVAudioFile = try AVAudioFile(forWriting: audioRecordingUrl!, settings: audioMixerNodeOutputFormat.settings)
           let audioMixerNodeOutputFormat = audioMixerNode!.outputFormat(forBus: 0)
 
-          audioMixerNode!.installTap(onBus: 0, bufferSize: 4096, format: audioMixerNodeOutputFormat, block: {
-            (buffer, time) in
+          let levelLowpassTrig: Float = 0.3
+          var averagePower: Float = 0
+          // var averagePowerForChannel1: Float = 0
+
+          audioMixerNode!.installTap(onBus: 0, bufferSize: 1024, format: audioMixerNodeOutputFormat, block: {
+            (buffer: AVAudioPCMBuffer, time: AVAudioTime) in
+            let inNumberFrames:UInt = UInt(buffer.frameLength)
+            // if buffer.format.channelCount > 0 {
+            let samples = (buffer.floatChannelData![0])
+            var maxAmp:Float32 = 0
+            var avgAmp:Float32 = 0
+            vDSP_meamgv(samples,1 , &avgAmp, inNumberFrames)
+            vDSP_maxmgv(samples, 1, &maxAmp, inNumberFrames)
+            // var v:Float = -100
+            // if avgValue != 0 {
+            //     v = 20.0 * log10f(avgValue)
+            // }
+            // averagePower = (levelLowpassTrig * v) + ((1 - levelLowpassTrig) * averagePower)
+            // averagePowerForChannel1 = averagePower
+            // print("averagePower: \(averagePower)")
+
+            self.eventSink?([
+              "type": "audioRecorder/metered",
+              "payload": [
+                "avgAmplitude": avgAmp,
+                "maxAmplitude": maxAmp,
+                // "sample": buffer.floatChannelData![0][0],
+                // "sampleTime": time.sampleTime,
+                // "sampleRate": time.sampleRate,
+              ],
+            ])
             try? self.audioRecordingFile!.write(from: buffer)
           })
 
@@ -198,9 +216,8 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
   }
 
   public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-    print("didFinishPlaying")
     eventSink?([
-      "type": "audioPlayer/didFinishPlaying",
+      "type": "audioPlayer/finishedPlaying",
       "payload": [
         "success": flag,
       ],
@@ -216,56 +233,4 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
     eventSink = nil
     return nil
   }
-
-  
-
-  // public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-  //   eventSink = events
-  //   return nil
-  // }
-
-  // public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-  //   eventSink = nil
-  //   return nil
-  // }
 }
-
-// private class AudioPlayerEventStreamHandler: NSObject, FlutterStreamHandler {
-//   public var eventSink: FlutterEventSink?
-
-//   public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-//     eventSink = events
-//     return nil
-//   }
-
-//   public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-//     eventSink = nil
-//     return nil
-//   }
-// }
-
-// private class AudioRecorderEventStreamHandler: NSObject, FlutterStreamHandler {
-//   public var eventSink: FlutterEventSink?
-
-//   public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-//     eventSink = events
-//     return nil
-//   }
-
-//   public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-//     eventSink = nil
-//     return nil
-//   }
-// }
-
-
-// public class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate {
-//   private var onDidFinishPlaying: (Bool) -> Void
-//   init(onDidFinishPlaying: @escaping (Bool) -> Void) {
-//     self.onDidFinishPlaying = onDidFinishPlaying
-//   }
-  // public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-  //   print("didFinishPlaying")
-  //   onDidFinishPlaying(flag)
-  // }
-// }

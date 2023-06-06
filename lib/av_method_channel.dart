@@ -13,7 +13,7 @@ class MethodChannelAv extends AvPlatformInterface {
   //     const EventChannel('av/events/audio_recorder');
 
   @override
-  Future<String?> prepareToRecordMpeg4Aac(
+  Future<bool?> prepareToRecordMpeg4Aac(
       {int numberOfChannels = 2,
       int sampleRate = 44100,
       int bitRate = 256000}) async {
@@ -22,16 +22,16 @@ class MethodChannelAv extends AvPlatformInterface {
       'sampleRate': sampleRate,
       'bitRate': bitRate,
     };
-    final result = await methodChannel.invokeMethod<String?>(
+    final result = await methodChannel.invokeMethod<bool?>(
         'prepareToRecordMpeg4Aac', args);
     return result;
   }
 
   @override
-  Future<String?> prepareToRecordAlac(
+  Future<bool?> prepareToRecordAlac(
       {int numberOfChannels = 2, int sampleRate = 44100}) async {
     final result =
-        await methodChannel.invokeMethod<String?>('prepareToRecordAlac', {
+        await methodChannel.invokeMethod<bool?>('prepareToRecordAlac', {
       'numberOfChannels': numberOfChannels,
       'sampleRate': sampleRate,
     });
