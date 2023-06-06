@@ -19,35 +19,56 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
     // registrar.addApplicationDelegate(instance)
   }
 
-  private var recordingDestinationUrlString: String?
+  private var recordingDestinationUrl: String?
   private var audioPlayer: AVAudioPlayer?
+  private var audioRecorder: AVAudioRecorder?
   private var eventSink: FlutterEventSink?
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
       case "prepareToRecordMpeg4Aac":
         let arguments = call.arguments as! [String: Int]
-        let (urlString, error) = AvPluginAudioRecorder.prepareToRecordMpeg4Aac(sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2, bitRate: arguments["bitRate"] ?? 256000, onEvent: {
-          (event: Any) -> () in
-          // audioRecorderEventStreamHandler?.eventSink()
-        })
-        recordingDestinationUrlString = urlString
-        error == nil ? result(urlString) : result(error)
+        let directory = NSTemporaryDirectory()
+        let filename = UUID().uuidString + ".m4a"
+        let url: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
+        let (audioRecorder, error) = AvPluginAudioRecorder.prepareToRecordMpeg4Aac(url: url!, sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2, bitRate: arguments["bitRate"] ?? 256000)
+        if audioRecorder != nil {
+          self.audioRecorder = audioRecorder
+        }
+        recordingDestinationUrl = url
+        error == nil ? result(recordingDestinationUrl) : result(error)
       case "prepareToRecordAlac":
         let arguments = call.arguments as! [String: Int]
-        let (urlString, error) = AvPluginAudioRecorder.prepareToRecordAlac(sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2, onEvent: {
-          (event: Any) -> () in
-          // audioRecorderEventStreamHandler?.eventSink()
-        })
-        recordingDestinationUrlString = urlString
-        error == nil ? result(urlString) : result(error)
+        let directory = NSTemporaryDirectory()
+        let filename = UUID().uuidString + ".alac"
+        let url: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
+        let (audioRecorder, error) = AvPluginAudioRecorder.prepareToRecordAlac(url: url!, sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2)
+        if audioRecorder != nil {
+          // audioRecorder.delegate = AudioRecorderDelegate(onDidFinishRecording: onDidFinishRecording)
+          self.audioRecorder = audioRecorder
+          // self.audioRecorder!.delegate = self
+        }
+        recordingDestinationUrl = url
+        error == nil ? result(recordingDestinationUrl) : result(error)
       case "startRecording":
-        result(AvPluginAudioRecorder.startRecording())
+        if (audioRecorder == nil) {
+          result(FlutterError(code: "startRecording", message: "prepareToRecord has not been called", details: nil))
+          return
+        }
+        result(AvPluginAudioRecorder.startRecording(audioRecorder!))
       case "stopRecording":
-        AvPluginAudioRecorder.stopRecording()
-        result(recordingDestinationUrlString)
+        if (audioRecorder == nil) {
+          result(FlutterError(code: "stopRecording", message: "prepareToRecord has not been called", details: nil))
+          return
+        }
+        AvPluginAudioRecorder.stopRecording(audioRecorder!)
+        result(recordingDestinationUrl)
       case "deleteRecording":
-        result(AvPluginAudioRecorder.deleteRecording())
+        if (audioRecorder == nil) {
+          result(FlutterError(code: "deleteRecording", message: "prepareToRecord has not been called", details: nil))
+          return
+        }
+        result(AvPluginAudioRecorder.deleteRecording(audioRecorder!))
       case "prepareToPlay":
         let arguments = call.arguments as! [String: String]
         let (audioPlayer, error) = AvPluginAudioPlayer.prepareToPlay(url: arguments["url"]!)

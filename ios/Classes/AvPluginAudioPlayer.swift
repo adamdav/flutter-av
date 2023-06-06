@@ -3,8 +3,6 @@ import AVFoundation
 
 
 public class AvPluginAudioPlayer: NSObject {
-  // private static var audioPlayer: AVAudioPlayer?
-
   public static func prepareToPlay(url: String) -> (AVAudioPlayer?, FlutterError?) {
     let session = AVAudioSession.sharedInstance()
 

@@ -2,29 +2,29 @@ import Flutter
 import AVFoundation
 
 public class AvPluginAudioRecorder: NSObject {
-  private static var audioRecorder: AVAudioRecorder?
+  // private static var audioRecorder: AVAudioRecorder?
 
-  public static func prepareToRecordMpeg4Aac(sampleRate: Int, numberOfChannels: Int, bitRate: Int, onEvent: (Any) -> ()) -> (String?, FlutterError?) {
-    return prepareToRecordLossy(errorCode: "prepareToRecordMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), fileExtension: ".m4a", sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitRate: bitRate)
+  public static func prepareToRecordMpeg4Aac(url: String, sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (AVAudioRecorder?, FlutterError?) {
+    return prepareToRecordLossy(url: url, errorCode: "prepareToRecordMpeg4Aac", formatIdKey: Int(kAudioFormatMPEG4AAC), sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitRate: bitRate)
   }
 
-  public static func prepareToRecordAlac(sampleRate: Int, numberOfChannels: Int, onEvent: (Any) -> ()) -> (String?, FlutterError?) {
-    return prepareToRecordLossless(errorCode: "prepareToRecordAlac", formatIdKey: Int(kAudioFormatAppleLossless), fileExtension: ".alac", sampleRate: sampleRate, numberOfChannels: numberOfChannels)
+  public static func prepareToRecordAlac(url: String, sampleRate: Int, numberOfChannels: Int) -> (AVAudioRecorder?, FlutterError?) {
+    return prepareToRecordLossless(url: url, errorCode: "prepareToRecordAlac", formatIdKey: Int(kAudioFormatAppleLossless), sampleRate: sampleRate, numberOfChannels: numberOfChannels)
   }
 
-  public static func startRecording() -> Bool {
-    return audioRecorder?.record() != nil
+  public static func startRecording(_ audioRecorder: AVAudioRecorder) -> Bool {
+    return audioRecorder.record()
   }
   
-  public static func stopRecording() {
-    audioRecorder?.stop()
+  public static func stopRecording(_ audioRecorder: AVAudioRecorder) {
+    audioRecorder.stop()
   }
 
-  public static func deleteRecording() -> Bool {
-    return audioRecorder?.deleteRecording() != nil
+  public static func deleteRecording(_ audioRecorder: AVAudioRecorder) -> Bool {
+    return audioRecorder.deleteRecording()
   }
 
-  private static func prepareToRecordLossy(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (String?, FlutterError?) {
+  private static func prepareToRecordLossy(url: String, errorCode: String, formatIdKey: Int, sampleRate: Int, numberOfChannels: Int, bitRate: Int) -> (AVAudioRecorder?, FlutterError?) {
     let settings = [
       AVFormatIDKey: formatIdKey,
       AVSampleRateKey: sampleRate,
@@ -32,21 +32,21 @@ public class AvPluginAudioRecorder: NSObject {
       AVEncoderBitRateKey: bitRate,
     ]
 
-    return prepareToRecord(errorCode: errorCode, formatIdKey: formatIdKey, fileExtension: fileExtension, settings: settings)
+    return prepareToRecord(url: url, errorCode: errorCode, formatIdKey: formatIdKey, settings: settings)
   }
 
-  private static func prepareToRecordLossless(errorCode: String, formatIdKey: Int, fileExtension: String, sampleRate: Int, numberOfChannels: Int) -> (String?, FlutterError?) {
+  private static func prepareToRecordLossless(url: String, errorCode: String, formatIdKey: Int, sampleRate: Int, numberOfChannels: Int) -> (AVAudioRecorder?, FlutterError?) {
     let settings = [
       AVFormatIDKey: formatIdKey,
-      AVSampleRateKey: sampleRate ?? 44100,
-      AVNumberOfChannelsKey: numberOfChannels ?? 2,
+      AVSampleRateKey: sampleRate,
+      AVNumberOfChannelsKey: numberOfChannels,
     ]
 
-    return prepareToRecord(errorCode: errorCode, formatIdKey: formatIdKey, fileExtension: fileExtension, settings: settings)
+    return prepareToRecord(url: url, errorCode: errorCode, formatIdKey: formatIdKey, settings: settings)
   }
 
 
-  private static func prepareToRecord(errorCode: String, formatIdKey: Int, fileExtension: String, settings: [String : Int]) -> (String?, FlutterError?) {
+  private static func prepareToRecord(url: String, errorCode: String, formatIdKey: Int, settings: [String : Int]) -> (AVAudioRecorder?, FlutterError?) {
     let session = AVAudioSession.sharedInstance()
 
     do {
@@ -61,10 +61,11 @@ public class AvPluginAudioRecorder: NSObject {
       return (nil, FlutterError(code: errorCode, message: "Failed to activate audio session instance", details: "\(error)"))
     }
 
-    let directory = NSTemporaryDirectory()
-    let filename = UUID().uuidString + fileExtension
-    let urlString: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
-    audioRecorder = try? AVAudioRecorder(url: URL(string: urlString!)!, settings: settings)
-    return (audioRecorder!.prepareToRecord() ? urlString : nil, nil)
+    // let directory = NSTemporaryDirectory()
+    // let filename = UUID().uuidString + fileExtension
+    // let urlString: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
+    let audioRecorder = try? AVAudioRecorder(url: URL(string: url)!, settings: settings)
+    let didPrepareToRecord = audioRecorder?.prepareToRecord() ?? false
+    return didPrepareToRecord ? (audioRecorder, nil) : (nil, FlutterError(code: errorCode, message: "Failed to prepare to record", details: nil))
   }
 }

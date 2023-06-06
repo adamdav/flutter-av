@@ -24,6 +24,7 @@ class MethodChannelAv extends AvPlatformInterface {
     };
     final result = await methodChannel.invokeMethod<String?>(
         'prepareToRecordMpeg4Aac', args);
+    print(result);
     return result;
   }
 
