@@ -19,56 +19,148 @@ public class AvPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, AVAudioPla
     // registrar.addApplicationDelegate(instance)
   }
 
-  private var recordingDestinationUrl: String?
+  private var audioRecordingFile: AVAudioFile?
   private var audioPlayer: AVAudioPlayer?
   private var audioRecorder: AVAudioRecorder?
+  private var audioEngine: AVAudioEngine?
+  private var audioMixerNode: AVAudioMixerNode?
   private var eventSink: FlutterEventSink?
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
       case "prepareToRecordMpeg4Aac":
-        let arguments = call.arguments as! [String: Int]
-        let directory = NSTemporaryDirectory()
-        let filename = UUID().uuidString + ".m4a"
-        let url: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
-        let (audioRecorder, error) = AvPluginAudioRecorder.prepareToRecordMpeg4Aac(url: url!, sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2, bitRate: arguments["bitRate"] ?? 256000)
-        if audioRecorder != nil {
-          self.audioRecorder = audioRecorder
+        do {
+          let session: AVAudioSession = AVAudioSession.sharedInstance()
+          try session.setCategory(.playAndRecord, options: .defaultToSpeaker)
+          try session.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+          result(FlutterError(code: "prepareToRecordMpeg4Aac", message: "Failed to set category .record on shared audio session instance", details: "\(error)"))
+          return
         }
-        recordingDestinationUrl = url
-        error == nil ? result(recordingDestinationUrl) : result(error)
-      case "prepareToRecordAlac":
-        let arguments = call.arguments as! [String: Int]
-        let directory = NSTemporaryDirectory()
-        let filename = UUID().uuidString + ".alac"
-        let url: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
-        let (audioRecorder, error) = AvPluginAudioRecorder.prepareToRecordAlac(url: url!, sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2)
-        if audioRecorder != nil {
-          // audioRecorder.delegate = AudioRecorderDelegate(onDidFinishRecording: onDidFinishRecording)
-          self.audioRecorder = audioRecorder
-          // self.audioRecorder!.delegate = self
+
+        audioEngine = AVAudioEngine()
+        audioMixerNode = AVAudioMixerNode()
+
+        // Set volume to 0 to avoid audio feedback while recording.
+        audioMixerNode!.volume = 0
+
+        audioEngine!.attach(audioMixerNode!)
+
+        let audioEngineInputNodeOutputFormat = audioEngine!.inputNode.outputFormat(forBus: 0)
+        audioEngine!.connect(audioEngine!.inputNode, to: audioMixerNode!, format: audioEngineInputNodeOutputFormat)
+
+        let audioMixerNodeOutputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: audioEngineInputNodeOutputFormat.sampleRate, channels: 2, interleaved: false)
+        
+        // let audioMixerNodeOutputFormat: AVAudioFormat = audioMixerNode!.outputFormat(forBus: 0)
+        audioEngine!.connect(audioMixerNode!, to: audioEngine!.mainMixerNode, format: audioMixerNodeOutputFormat)
+
+        print("audioEngineInputNodeOutputFormat: \(audioEngineInputNodeOutputFormat)")
+        print("audioMixerNodeInputFormat: \(audioMixerNode!.inputFormat(forBus: 0))")
+        print("audioMixerNodeOutputFormat: \(audioMixerNode!.outputFormat(forBus: 0))")
+        print("audioEngineMainMixerNodeInputFormat: \(audioEngine!.mainMixerNode.inputFormat(forBus: 0))")
+        print("audioEngineMainMixerNodeOutputFormat: \(audioEngine!.mainMixerNode.outputFormat(forBus: 0))")
+        
+        // Prepare the engine in advance, in order for the system to allocate the necessary resources.
+        audioEngine!.prepare()
+
+        let audioRecordingUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(UUID().uuidString + ".caf")
+
+        // AVAudioFile uses the Core Audio Format (CAF) to write to disk.
+        // So we're using the caf file extension.
+        do {
+          audioRecordingFile = try AVAudioFile(forWriting: audioRecordingUrl, settings: audioMixerNode!.outputFormat(forBus: 0).settings)
+          result(audioRecordingFile!.url.absoluteString)
+        } catch {
+          result(FlutterError(code: "prepareToRecord", message: "Failed to create audio recording file", details: "\(error)"))
+          return
         }
-        recordingDestinationUrl = url
-        error == nil ? result(recordingDestinationUrl) : result(error)
+
+
+
+        // result("")
+        // audioRecordingFile = try AVAudioFile(forWriting: audioRecordingUrl, settings: audioMixerNodeOutputFormat.settings)
+
+        // audioRecordingFile != nil ? result(audioRecordingFile!.url.absoluteString) : result(FlutterError(code: "prepareToRecord", message: "Failed to create audio recording file", details: nil))
+
+        // let arguments = call.arguments as! [String: Int]
+        // let directory = NSTemporaryDirectory()
+        // let filename = UUID().uuidString + ".m4a"
+        // let url: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
+        // let (audioRecorder, error) = AvPluginAudioRecorder.prepareToRecordMpeg4Aac(url: url!, sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2, bitRate: arguments["bitRate"] ?? 256000)
+        // if audioRecorder != nil {
+        //   self.audioRecorder = audioRecorder
+        // }
+        // audioRecordingUrl = url
+        // error == nil ? result(audioRecordingUrl) : result(error)
+      // case "prepareToRecordAlac":
+      //   let arguments = call.arguments as! [String: Int]
+      //   // let directory = NSTemporaryDirectory()
+      //   // let filename = UUID().uuidString + ".alac"
+      //   // let url: String? = NSURL.fileURL(withPathComponents: [directory, filename])?.absoluteString
+      //   let (audioRecorder, error) = AvPluginAudioRecorder.prepareToRecordAlac(url: url!, sampleRate: arguments["sampleRate"] ?? 44100, numberOfChannels: arguments["numberOfChannels"] ?? 2)
+      //   if audioRecorder != nil {
+      //     // audioRecorder.delegate = AudioRecorderDelegate(onDidFinishRecording: onDidFinishRecording)
+      //     self.audioRecorder = audioRecorder
+      //     // self.audioRecorder!.delegate = self
+      //   }
+      //   audioRecordingUrl = url
+      //   error == nil ? result(audioRecordingUrl) : result(error)
       case "startRecording":
-        if (audioRecorder == nil) {
-          result(FlutterError(code: "startRecording", message: "prepareToRecord has not been called", details: nil))
+        do {
+          // let tapNode: AVAudioNode = mixerNode
+          // let audioMixerNodeOutputFormat = audioMixerNode.outputFormat(forBus: 0)
+
+          // // let audioFileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].documentURL.appendingPathComponent(UUID().uuidString + ".caf")
+          
+          // // AVAudioFile uses the Core Audio Format (CAF) to write to disk.
+          // // So we're using the caf file extension.
+          if audioRecordingFile == nil {
+            result(FlutterError(code: "startRecording", message: "prepareToRecord has not been called", details: nil))
+            return
+          }
+
+          // let audioFile: AVAudioFile = try AVAudioFile(forWriting: audioRecordingUrl!, settings: audioMixerNodeOutputFormat.settings)
+          let audioMixerNodeOutputFormat = audioMixerNode!.outputFormat(forBus: 0)
+
+          audioMixerNode!.installTap(onBus: 0, bufferSize: 4096, format: audioMixerNodeOutputFormat, block: {
+            (buffer, time) in
+            try? self.audioRecordingFile!.write(from: buffer)
+          })
+
+          try audioEngine!.start()
+          result(true)
+        } catch {
+          result(FlutterError(code: "startRecording", message: "Failed to start audio engine", details: "\(error)"))
           return
         }
-        result(AvPluginAudioRecorder.startRecording(audioRecorder!))
+        // if (audioRecorder == nil) {
+        //   result(FlutterError(code: "startRecording", message: "prepareToRecord has not been called", details: nil))
+        //   return
+        // }
+        // result(AvPluginAudioRecorder.startRecording(audioRecorder!))
       case "stopRecording":
-        if (audioRecorder == nil) {
-          result(FlutterError(code: "stopRecording", message: "prepareToRecord has not been called", details: nil))
-          return
-        }
-        AvPluginAudioRecorder.stopRecording(audioRecorder!)
-        result(recordingDestinationUrl)
+        audioMixerNode?.removeTap(onBus: 0)
+        audioEngine?.stop()
+        // if (audioRecorder == nil) {
+        //   result(FlutterError(code: "stopRecording", message: "prepareToRecord has not been called", details: nil))
+        //   return
+        // }
+        // AvPluginAudioRecorder.stopRecording(audioRecorder!)
+        result(audioRecordingFile?.url.absoluteString)
       case "deleteRecording":
-        if (audioRecorder == nil) {
-          result(FlutterError(code: "deleteRecording", message: "prepareToRecord has not been called", details: nil))
+        do {
+          try FileManager.default.removeItem(at: audioRecordingFile!.url)
+          result(true)
+        } catch {
+          result(FlutterError(code: "deleteRecording", message: "Failed to delete audio recording file", details: "\(error)"))
           return
         }
-        result(AvPluginAudioRecorder.deleteRecording(audioRecorder!))
+        // result(FileManager.default.removeItem(at: audioRecordingFile!.url))
+        // if (audioRecorder == nil) {
+        //   result(FlutterError(code: "deleteRecording", message: "prepareToRecord has not been called", details: nil))
+        //   return
+        // }
+        // result(AvPluginAudioRecorder.deleteRecording(audioRecorder!))
       case "prepareToPlay":
         let arguments = call.arguments as! [String: String]
         let (audioPlayer, error) = AvPluginAudioPlayer.prepareToPlay(url: arguments["url"]!)
