@@ -94,7 +94,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
         });
       }
       if (event['type'] == 'audioRecorder/metered') {
-        print(event['payload']);
+        //print(event['payload']);
         setState(() {
           _amplitudes = [..._amplitudes, event['payload']['avgAmplitude']];
         });
@@ -138,13 +138,30 @@ class _AudioRecorderState extends State<AudioRecorder> {
         Expanded(
             flex: 2,
             child: Container(
-              // width: double.infinity,
-              // height: 200,
-              // color: Colors.red,
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: AudioWaveform(amplitudes: _amplitudes)),
-            )),
+                color: Colors.red,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: 0,
+                      child: AudioWaveform(),
+                      // Text(
+                      //   'Waveform waveform waveform waveform waveform waveform waveform.',
+                      //   style: TextStyle(color: Colors.white),
+                      //   softWrap: false,
+                      // ),
+                    )
+                  ],
+                ))),
+        // Expanded(
+        //     flex: 2,
+        //     child: Container(
+        //         // width: double.infinity,
+        //         // height: 200,
+        //         color: Colors.red,
+        //         // child: SingleChildScrollView(
+        //         //     scrollDirection: Axis.horizontal,
+        //         //     child: AudioWaveform(amplitudes: _amplitudes)),
+        //         child: AudioWaveform(amplitudes: _amplitudes))),
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
