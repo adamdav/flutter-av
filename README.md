@@ -1,6 +1,9 @@
 # av
 
+https://pub.dev/packages/av
+
 An audio/video plugin for Flutter.
+
 
 ## Installation
 
@@ -10,7 +13,7 @@ flutter pub add av
 
 ## iOS Setup
 
-If your app needs to record audio, add the NSMicrophoneUsageDescription key to ios/Runner/Info.plist:
+If your app needs to capture audio, add the NSMicrophoneUsageDescription key to ios/Runner/Info.plist:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -25,7 +28,7 @@ If your app needs to record audio, add the NSMicrophoneUsageDescription key to i
 </plist>
 ```
 
-If your app needs to record video, add the NSCameraUsageDescription key to ios/Runner/Info.plist:
+<!-- If your app needs to record video, add the NSCameraUsageDescription key to ios/Runner/Info.plist:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -38,7 +41,7 @@ If your app needs to record video, add the NSCameraUsageDescription key to ios/R
     ...
 </dict>
 </plist>
-```
+``` -->
 
 ## TODO: Android Setup
 
