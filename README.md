@@ -2,10 +2,6 @@
 
 An audio/video recording and streaming package for Flutter.
 
-## Overview
-
-Flutter AV is state management agnostic. By default, each widget is "smart" and wired directly to native audio/video state. You are given full control over each widget's appearance. You can also use the Flutter AV utility functions to wire up your own custom components directly to native audio/video state, or you can use the utility functions to sync native audio/video state with whatever state management library you choose. Flutter AV is extremely flexible.
-
 ## Installation
 
 ```sh
