@@ -21,7 +21,7 @@ class RecordButton extends StatelessWidget {
           // shape: const CircleBorder(),
           // elevation: 10,
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50.0),
@@ -33,8 +33,12 @@ class RecordButton extends StatelessWidget {
           child: Center(
               child: isRecording
                   ? SvgPicture.asset('icons/player-stop-filled.svg',
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av')
                   : SvgPicture.asset('icons/player-record-filled.svg',
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av'))),
     );
   }

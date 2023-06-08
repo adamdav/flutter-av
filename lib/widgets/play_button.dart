@@ -17,7 +17,7 @@ class PlayButton extends StatelessWidget {
       width: 75,
       child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50.0),
@@ -28,8 +28,12 @@ class PlayButton extends StatelessWidget {
           child: Center(
               child: isPlaying
                   ? SvgPicture.asset('icons/player-pause-filled.svg',
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av')
                   : SvgPicture.asset('icons/player-play-filled.svg',
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av'))),
     );
   }

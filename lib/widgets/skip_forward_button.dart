@@ -16,7 +16,7 @@ class SkipForwardButton extends StatelessWidget {
       width: 50,
       child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50.0),
@@ -28,6 +28,8 @@ class SkipForwardButton extends StatelessWidget {
           child: Center(
               child: icon ??
                   SvgPicture.asset('icons/rewind-forward-15.svg',
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av'))),
     );
   }
