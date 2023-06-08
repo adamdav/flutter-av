@@ -1,6 +1,7 @@
 name: av
 description: An audio/video plugin for Flutter.
-version: 0.0.1
+version: 0.0.2
+repository: https://github.com/adamdav/flutter-av
 # homepage:
 
 environment:

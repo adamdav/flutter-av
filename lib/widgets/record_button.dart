@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// import 'package:flutter/material.dart';
 
 class RecordButton extends StatelessWidget {
   const RecordButton(
@@ -34,11 +32,11 @@ class RecordButton extends StatelessWidget {
               child: isRecording
                   ? SvgPicture.asset('icons/player-stop-filled.svg',
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av')
                   : SvgPicture.asset('icons/player-record-filled.svg',
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av'))),
     );
   }

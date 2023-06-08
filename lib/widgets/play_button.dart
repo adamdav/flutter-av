@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// import 'package:flutter/material.dart';
 
 class PlayButton extends StatelessWidget {
   const PlayButton(
@@ -29,11 +27,11 @@ class PlayButton extends StatelessWidget {
               child: isPlaying
                   ? SvgPicture.asset('icons/player-pause-filled.svg',
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av')
                   : SvgPicture.asset('icons/player-play-filled.svg',
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av'))),
     );
   }

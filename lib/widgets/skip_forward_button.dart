@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// import 'package:flutter/material.dart';
 
 class SkipForwardButton extends StatelessWidget {
   const SkipForwardButton({super.key, required this.onPressed, this.icon});
@@ -29,7 +27,7 @@ class SkipForwardButton extends StatelessWidget {
               child: icon ??
                   SvgPicture.asset('icons/rewind-forward-15.svg',
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       package: 'av'))),
     );
   }
