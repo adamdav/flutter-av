@@ -9,3 +9,6 @@ Update the example.
 
 ## 0.0.4
 Update the CHANGELOG.
+
+## 0.0.5
+Update the LICENSE.
