@@ -27,14 +27,13 @@ class AudioRecorder extends StatefulWidget {
 }
 
 class _AudioRecorderState extends State<AudioRecorder> {
-  // List<num> _amplitudes = [];
+  List<double> _amplitudes = [];
   List<String> _savedRecordings = [];
   bool _isPreparedToRecord = false;
   bool _isRecording = false;
   String? _audioRecordingUrl;
   bool _isPreparedToPlay = false;
   bool _isPlaying = false;
-  // final _waveformScrollController = ScrollController();
   StreamSubscription? _eventBroadcastStreamSubscription;
 
   @override
@@ -54,12 +53,12 @@ class _AudioRecorderState extends State<AudioRecorder> {
           _isPlaying = false;
         });
       }
-      // if (event['type'] == 'audioRecorder/metered') {
-      //   //print(event['payload']);
-      //   setState(() {
-      //     _amplitudes = [..._amplitudes, event['payload']['avgAmplitude']];
-      //   });
-      // }
+      if (event['type'] == 'audioRecorder/metered') {
+        //print(event['payload']);
+        setState(() {
+          _amplitudes = [..._amplitudes, event['payload']['avgAmplitude']];
+        });
+      }
     });
     _prepareToRecord();
   }
@@ -147,7 +146,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       children: [
         Expanded(
             child: Center(child: Clock(isRunning: _isRecording || _isPlaying))),
-        const Expanded(flex: 2, child: AudioWaveform()),
+        Expanded(flex: 2, child: AudioWaveform(amplitudes: _amplitudes)),
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

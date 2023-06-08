@@ -1,16 +1,15 @@
-import 'dart:async';
-
-import 'package:av/av_platform_interface.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AudioWaveform extends StatefulWidget {
   const AudioWaveform(
       {super.key,
+      this.amplitudes = const [],
       this.height = 300.0,
       this.barWidth = 5.0,
       this.barSpace = 2.0});
 
+  final List<double> amplitudes;
   final double height;
   final double barWidth;
   final double barSpace;
@@ -21,22 +20,22 @@ class AudioWaveform extends StatefulWidget {
 
 class _AudioWaveformState extends State<AudioWaveform> {
   final List<Map> _segments = [];
-  StreamSubscription? _eventBroadcastStreamSubscription;
 
   @override
   void initState() {
     super.initState();
-    _eventBroadcastStreamSubscription =
-        AvPlatformInterface.instance.getEventBroadcastStream().listen((event) {
-      if (event['type'] == 'audioRecorder/deletedRecording') {
-        setState(() {
-          _segments.clear();
-        });
-      }
-      if (event['type'] == 'audioRecorder/metered') {
-        final newAmplitude = event['payload']['avgAmplitude'];
+  }
 
-        // Chop amplitudes into segments of 100 because the painter can't handle large paths
+  @override
+  void didUpdateWidget(AudioWaveform oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.amplitudes != oldWidget.amplitudes) {
+      final newAmplitudes =
+          widget.amplitudes.sublist(oldWidget.amplitudes.length);
+
+      // Chop amplitudes into segments of 100 because the painter can't handle large paths
+      for (var newAmplitude in newAmplitudes) {
         if (_segments.isNotEmpty &&
             _segments.last['amplitudes'] != null &&
             _segments.last['amplitudes'].length < 100) {
@@ -75,13 +74,7 @@ class _AudioWaveformState extends State<AudioWaveform> {
           });
         }
       }
-    });
-  }
-
-  @override
-  void dispose() {
-    _eventBroadcastStreamSubscription?.cancel();
-    super.dispose();
+    }
   }
 
   @override
@@ -94,7 +87,7 @@ class _AudioWaveformState extends State<AudioWaveform> {
             for (var segmentIndex = 0;
                 segmentIndex < _segments.length;
                 segmentIndex++)
-              AudioWaveformSegment(
+              _AudioWaveformSegment(
                 path: _segments[segmentIndex]['path'],
                 size: Size(
                     _segments[segmentIndex]['amplitudes'].isNotEmpty
@@ -113,13 +106,13 @@ class _AudioWaveformState extends State<AudioWaveform> {
   }
 }
 
-class AudioWaveformSegment extends StatelessWidget {
-  const AudioWaveformSegment({
-    super.key,
+class _AudioWaveformSegment extends StatelessWidget {
+  const _AudioWaveformSegment({
+    Key? key,
     required this.size,
     required this.path,
     required this.barWidth,
-  });
+  }) : super(key: key);
 
   final Size size;
   final Path path;
