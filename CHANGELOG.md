@@ -12,3 +12,6 @@ Update the CHANGELOG.
 
 ## 0.0.5
 Update the LICENSE.
+
+## 0.0.6
+Update the README.

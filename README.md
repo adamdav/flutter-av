@@ -1,6 +1,6 @@
 # av
 
-An audio/video recording and streaming package for Flutter.
+An audio/video plugin for Flutter.
 
 ## Installation
 
