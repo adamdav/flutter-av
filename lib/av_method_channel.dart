@@ -9,6 +9,8 @@ class MethodChannelAv extends AvPlatformInterface {
   @visibleForTesting
   final methodChannel = const MethodChannel('av/methods');
   final eventChannel = const EventChannel('av/events');
+
+  Stream<dynamic>? eventBroadcastStream;
   // final audioRecorderEventChannel =
   //     const EventChannel('av/events/audio_recorder');
 
@@ -81,8 +83,10 @@ class MethodChannelAv extends AvPlatformInterface {
   }
 
   @override
-  Stream<dynamic> getEventStream() {
-    return eventChannel.receiveBroadcastStream();
+  Stream<dynamic> getEventBroadcastStream() {
+    eventBroadcastStream ??= eventChannel.receiveBroadcastStream();
+    return eventBroadcastStream!;
+    // eventChannel.receiveBroadcastStream();
   }
 
   // @override

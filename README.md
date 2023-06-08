@@ -2,9 +2,19 @@
 
 An audio/video recording and streaming package for Flutter.
 
-## iOS Usage
+## Overview
 
-If your app needs access to the device's microphone, add the NSMicrophoneUsageDescription key to ios/Runner/Info.plist:
+Flutter AV is state management agnostic. By default, each widget is "smart" and wired directly to native audio/video state. You are given full control over each widget's appearance. You can also use the Flutter AV utility functions to wire up your own custom components directly to native audio/video state, or you can use the utility functions to sync native audio/video state with whatever state management library you choose. Flutter AV is extremely flexible.
+
+## Installation
+
+```sh
+flutter pub add av
+```
+
+## iOS Setup
+
+If your app needs to record audio, add the NSMicrophoneUsageDescription key to ios/Runner/Info.plist:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -19,7 +29,7 @@ If your app needs access to the device's microphone, add the NSMicrophoneUsageDe
 </plist>
 ```
 
-If your app needs access to the device's camera, add the NSCameraUsageDescription key to ios/Runner/Info.plist:
+If your app needs to record video, add the NSCameraUsageDescription key to ios/Runner/Info.plist:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -34,9 +44,8 @@ If your app needs access to the device's camera, add the NSCameraUsageDescriptio
 </plist>
 ```
 
+## Android Setup
 
-Run the app:
+## Web Setup
 
-```
-flutter run -d ios
-```
+## Usage

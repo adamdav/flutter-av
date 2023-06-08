@@ -66,8 +66,9 @@ abstract class AvPlatformInterface extends PlatformInterface {
     throw UnimplementedError('skip() has not been implemented.');
   }
 
-  Stream<dynamic> getEventStream() {
-    throw UnimplementedError('getEventStream() has not been implemented.');
+  Stream<dynamic> getEventBroadcastStream() {
+    throw UnimplementedError(
+        'getEventBroadcastStream() has not been implemented.');
   }
 
   // Future<String?> getPlatformVersion() {

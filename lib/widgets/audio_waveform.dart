@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:av/av_platform_interface.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +21,18 @@ class AudioWaveform extends StatefulWidget {
 
 class _AudioWaveformState extends State<AudioWaveform> {
   final List<Map> _segments = [];
+  StreamSubscription? _eventBroadcastStreamSubscription;
 
   @override
   void initState() {
     super.initState();
-    AvPlatformInterface.instance.getEventStream().listen((event) {
+    _eventBroadcastStreamSubscription =
+        AvPlatformInterface.instance.getEventBroadcastStream().listen((event) {
+      if (event['type'] == 'audioRecorder/deletedRecording') {
+        setState(() {
+          _segments.clear();
+        });
+      }
       if (event['type'] == 'audioRecorder/metered') {
         final newAmplitude = event['payload']['avgAmplitude'];
 
@@ -67,6 +76,12 @@ class _AudioWaveformState extends State<AudioWaveform> {
         }
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _eventBroadcastStreamSubscription?.cancel();
+    super.dispose();
   }
 
   @override

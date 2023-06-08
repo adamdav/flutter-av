@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:av/av_platform_interface.dart';
 import 'package:av/widgets/audio_waveform.dart';
 import 'package:av/widgets/clock.dart';
@@ -25,25 +27,52 @@ class AudioRecorder extends StatefulWidget {
 }
 
 class _AudioRecorderState extends State<AudioRecorder> {
-  List<num> _amplitudes = [];
+  // List<num> _amplitudes = [];
   List<String> _savedRecordings = [];
   bool _isPreparedToRecord = false;
   bool _isRecording = false;
-  String? _recordingDestinationUrl;
+  String? _audioRecordingUrl;
   bool _isPreparedToPlay = false;
   bool _isPlaying = false;
   // final _waveformScrollController = ScrollController();
+  StreamSubscription? _eventBroadcastStreamSubscription;
 
   @override
   void initState() {
     super.initState();
+    AvPlatformInterface.instance.getEventBroadcastStream().listen((event) {
+      print(event);
+      if (event['type'] == 'audioRecorder/deletedRecording') {
+        _prepareToRecord();
+        setState(() {
+          // _amplitudes = [];
+          _audioRecordingUrl = null;
+        });
+      }
+      if (event['type'] == 'audioPlayer/finishedPlaying') {
+        setState(() {
+          _isPlaying = false;
+        });
+      }
+      // if (event['type'] == 'audioRecorder/metered') {
+      //   //print(event['payload']);
+      //   setState(() {
+      //     _amplitudes = [..._amplitudes, event['payload']['avgAmplitude']];
+      //   });
+      // }
+    });
     _prepareToRecord();
-    _listenForEvents();
+  }
+
+  @override
+  void dispose() {
+    _eventBroadcastStreamSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _prepareToRecord() async {
     final isPreparedToRecord =
-        (await AvPlatformInterface.instance.prepareToRecordMpeg4Aac()) != null;
+        (await AvPlatformInterface.instance.prepareToRecordMpeg4Aac()) ?? false;
     setState(() {
       _isPreparedToRecord = isPreparedToRecord;
     });
@@ -61,51 +90,34 @@ class _AudioRecorderState extends State<AudioRecorder> {
         await AvPlatformInterface.instance.stopRecording();
     setState(() {
       _isRecording = false;
-      _recordingDestinationUrl = recordingDestinationUrl;
+      _audioRecordingUrl = recordingDestinationUrl;
     });
   }
 
-  Future<void> _deleteRecording() async {
-    await AvPlatformInterface.instance.deleteRecording();
-    setState(() {
-      // _savedRecordings = [..._savedRecordings, _recordingDestinationUrl!];
-      _amplitudes = [];
-      _recordingDestinationUrl = null;
-      // _isRecording = false;
-      // _recordingDestinationUrl = recordingDestinationUrl;
-    });
-  }
+  // Future<void> _deleteRecording() async {
+  //   await AvPlatformInterface.instance.deleteRecording();
+  //   setState(() {
+  //     // _savedRecordings = [..._savedRecordings, _audioRecordingUrl!];
+  //     _amplitudes = [];
+  //     _audioRecordingUrl = null;
+  //     // _isRecording = false;
+  //     // _audioRecordingUrl = recordingDestinationUrl;
+  //   });
+  // }
 
   void _saveRecording() {
     // await AudioRecorderUtils.saveRecording();
     setState(() {
-      _savedRecordings = [..._savedRecordings, _recordingDestinationUrl!];
-      _recordingDestinationUrl = null;
+      _savedRecordings = [..._savedRecordings, _audioRecordingUrl!];
+      _audioRecordingUrl = null;
       // _isRecording = false;
-      // _recordingDestinationUrl = recordingDestinationUrl;
-    });
-  }
-
-  void _listenForEvents() {
-    AvPlatformInterface.instance.getEventStream().listen((event) {
-      if (event['type'] == 'audioPlayer/finishedPlaying') {
-        setState(() {
-          _isPlaying = false;
-        });
-      }
-      if (event['type'] == 'audioRecorder/metered') {
-        //print(event['payload']);
-        setState(() {
-          _amplitudes = [..._amplitudes, event['payload']['avgAmplitude']];
-        });
-      }
+      // _audioRecordingUrl = recordingDestinationUrl;
     });
   }
 
   Future<void> _prepareToPlay() async {
-    if (_recordingDestinationUrl != null) {
-      await AvPlatformInterface.instance
-          .prepareToPlay(_recordingDestinationUrl!);
+    if (_audioRecordingUrl != null) {
+      await AvPlatformInterface.instance.prepareToPlay(_audioRecordingUrl!);
       setState(() {
         _isPreparedToPlay = true;
       });
@@ -143,7 +155,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (_recordingDestinationUrl != null) ...[
+                  if (_audioRecordingUrl != null) ...[
                     SkipBackButton(
                         icon: widget.skipBackIcon,
                         onPressed: () async {
@@ -151,7 +163,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                         }),
                     SizedBox(width: 10)
                   ],
-                  if (_recordingDestinationUrl != null)
+                  if (_audioRecordingUrl != null)
                     PlayButton(
                         onPressed: _isPreparedToPlay
                             ? () async {
@@ -163,7 +175,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                               }
                             : null,
                         isPlaying: _isPlaying),
-                  if (_recordingDestinationUrl == null)
+                  if (_audioRecordingUrl == null)
                     RecordButton(
                         onPressed: _isPreparedToRecord
                             ? () async {
@@ -176,7 +188,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                               }
                             : null,
                         isRecording: _isRecording),
-                  if (_recordingDestinationUrl != null) ...[
+                  if (_audioRecordingUrl != null) ...[
                     SizedBox(width: 10),
                     SkipForwardButton(
                         icon: widget.skipForwardIcon,
@@ -192,15 +204,12 @@ class _AudioRecorderState extends State<AudioRecorder> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (_recordingDestinationUrl != null) ...[
-                    DeleteButton(onPressed: () async {
-                      await _deleteRecording();
-                      await _prepareToRecord();
-                    }),
+                  if (_audioRecordingUrl != null) ...[
+                    const DeleteButton(),
                     SizedBox(width: 10),
-                    SaveButton(onPressed: () async {
+                    SaveButton(onPressed: () {
                       _saveRecording();
-                      await _prepareToRecord();
+                      _prepareToRecord();
                     })
                   ],
                 ],
