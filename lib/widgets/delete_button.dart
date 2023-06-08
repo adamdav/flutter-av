@@ -2,19 +2,10 @@ import 'package:av/av_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class DeleteButton extends StatefulWidget {
-  const DeleteButton({super.key});
+class DeleteButton extends StatelessWidget {
+  const DeleteButton({super.key, this.onPressed});
 
-  // final Function() onPressed;
-
-  @override
-  State<DeleteButton> createState() => _DeleteButtonState();
-}
-
-class _DeleteButtonState extends State<DeleteButton> {
-  void _deleteRecording() async {
-    await AvPlatformInterface.instance.deleteRecording();
-  }
+  final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +19,7 @@ class _DeleteButtonState extends State<DeleteButton> {
               ),
             ),
           ),
-          onPressed: _deleteRecording,
+          onPressed: onPressed,
           child: Center(
               child: Row(
             children: [

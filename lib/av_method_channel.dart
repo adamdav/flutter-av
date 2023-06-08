@@ -72,8 +72,8 @@ class MethodChannelAv extends AvPlatformInterface {
   }
 
   @override
-  Future<void> pausePlaying() async {
-    return await methodChannel.invokeMethod<void>('pausePlaying');
+  Future<bool?> pausePlaying() async {
+    return await methodChannel.invokeMethod<bool?>('pausePlaying');
   }
 
   @override

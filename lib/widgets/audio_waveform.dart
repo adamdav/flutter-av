@@ -30,6 +30,14 @@ class _AudioWaveformState extends State<AudioWaveform> {
   void didUpdateWidget(AudioWaveform oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    if (widget.amplitudes != oldWidget.amplitudes &&
+        widget.amplitudes.isEmpty) {
+      setState(() {
+        _segments.clear();
+      });
+      return;
+    }
+
     if (widget.amplitudes != oldWidget.amplitudes) {
       final newAmplitudes =
           widget.amplitudes.sublist(oldWidget.amplitudes.length);

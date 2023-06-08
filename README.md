@@ -44,8 +44,6 @@ If your app needs to record video, add the NSCameraUsageDescription key to ios/R
 </plist>
 ```
 
-## Android Setup
+## TODO: Android Setup
 
-## Web Setup
-
-## Usage
+## TODO: Web Setup
